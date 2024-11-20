@@ -9,82 +9,96 @@ To implement Ridge, Lasso, and ElasticNet regularization models using polynomial
 2. Anaconda – Python 3.7 Installation / Jupyter notebook
 
 ## Algorithm
-1. Load the dataset
-2. Preprocess the data
-3. Implement Ridge, Lasso and ElasticNet Regularization 
-4. Evaluate and visualize the result
+1. **Import Libraries**:  
+   Import the required libraries.
+
+2. **Load Dataset**:  
+   Load the dataset into the environment.
+
+3. **Data Preprocessing**:  
+   Handle missing values and encode categorical variables.
+
+4. **Define Features and Target**:  
+   Split the dataset into features (X) and the target variable (y).
+
+5. **Create Polynomial Features**:  
+   Generate polynomial features from the data.
+
+6. **Set Up Pipelines**:  
+   Create pipelines for Ridge, Lasso, and ElasticNet models.
+
+7. **Train Models**:  
+   Fit each model to the training data.
+
+8. **Evaluate Model Performance**:  
+   Assess performance using the R² score and Mean Squared Error (MSE).
+
+9. **Compare Results**:  
+   Compare the performance of the models.
 
 ## Program:
-```
-/*
+```python
+'''
 Program to implement Ridge, Lasso, and ElasticNet regularization using pipelines.
-Developed by: PRIYADHARSHINI P
-RegisterNumber:  212223240128
-*/
+Developed by: Priyadharshini.P
+RegisterNumber: 21223240128
+'''
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import Ridge, Lasso, ElasticNet
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error, r2_score
 
-data = pd.read_csv('car_price_prediction_.csv')
+# Load the dataset
+file_path = r'C:\Users\admin\Downloads\encoded_car_data (6).csv'
+car_data = pd.read_csv(file_path)
 
-X = data[['Year', 'Engine Size', 'Mileage', 'Condition']] 
-y = data['Price']
+# Splitting the dataset into features (X) and target (y)
+X = car_data.drop(columns=['price'])
+y = car_data['price']
 
-X = pd.get_dummies(X, drop_first=True)
-
+# Splitting into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-models = {
-    'Ridge Regression': Pipeline([
-        ('poly_features', PolynomialFeatures(degree=2)),
-        ('ridge_regressor', Ridge(alpha=1.0))
-    ]),
-    'Lasso Regression': Pipeline([
-        ('poly_features', PolynomialFeatures(degree=2)),
-        ('lasso_regressor', Lasso(alpha=1.0))
-    ]),
-    'ElasticNet Regression': Pipeline([
-        ('poly_features', PolynomialFeatures(degree=2)),
-        ('elasticnet_regressor', ElasticNet(alpha=1.0))
+# Define a function to create pipelines and evaluate models
+def evaluate_model(model, model_name):
+    # Create a pipeline
+    pipeline = Pipeline([
+        ('poly_features', PolynomialFeatures(degree=2, include_bias=False)),
+        ('scaler', StandardScaler()),
+        ('regressor', model)
     ])
-}
-
-plt.figure(figsize=(15, 10))
-
-for i, (model_name, model) in enumerate(models.items(), 1):
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-
+    
+    # Train the model
+    pipeline.fit(X_train, y_train)
+    
+    # Make predictions
+    y_pred = pipeline.predict(X_test)
+    
+    # Evaluate the model
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
-    
-    print(f'{model_name} - Mean Squared Error: {mse}')
-    print(f'{model_name} - R-squared: {r2}')
-    
+    print(f"{model_name} Model")
+    print(f"Mean Squared Error: {mse:.2f}")
+    print(f"R^2 Score: {r2:.2f}")
+    print("-" * 40)
+# Ridge Regression
+evaluate_model(Ridge(alpha=1.0), "Ridge")
 
-    plt.subplot(2, 2, i)
-    plt.scatter(y_test, y_pred, color='blue', label='Predicted Prices')
-    plt.plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2) 
-    plt.xlabel('Actual Prices')
-    plt.ylabel('Predicted Prices')
-    plt.title(f'Actual vs Predicted Car Prices using {model_name}')
-    plt.legend()
+# Lasso Regression with increased max_iter
+# Use PolynomialFeatures with degree=1 or 2
+evaluate_model(Lasso(alpha=1, max_iter=100000), "Lasso with Reduced Polynomial Degree")
 
-plt.tight_layout()
-plt.show()
+# ElasticNet Regression with increased max_iter
+evaluate_model(ElasticNet(alpha=0.1, l1_ratio=0.5, max_iter=1000000), "ElasticNet")
+
+
 ```
 
 ## Output:
-![image](https://github.com/user-attachments/assets/ba77c23c-70b1-4c8a-87b5-7a2e222958f9)
-![image](https://github.com/user-attachments/assets/5f0560f6-bc46-4505-9c0b-4b4fe34d6031)
 
-![image](https://github.com/user-attachments/assets/14509bd4-5fcb-4bfe-b0b6-ee39f5b28217)
+![image](https://github.com/user-attachments/assets/8a1ff4d8-a8f6-41ba-a936-ed37218c9bf4)
 
 
 
